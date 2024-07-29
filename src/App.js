@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 function App() {
   const [seconds, setSeconds] = useState(0);
@@ -6,57 +6,39 @@ function App() {
   const [hours, setHours] = useState(0);
 
   const refSeconds = useRef(0);
-  const refMinutes = useRef(0);
-  const refHours = useRef(0);
 
-  useEffect(() => {
+  function timeHandler() {
     refSeconds.current = setInterval(() => {
       setSeconds((prevSeconds) => prevSeconds + 1);
     }, 1000);
+  }
 
+  useEffect(() => {
+    timeHandler();
     return () => {
       clearInterval(refSeconds.current);
     };
   }, []);
 
   useEffect(() => {
-    refMinutes.current = setInterval(() => {
+    if (seconds === 60) {
+      setSeconds(0);
       setMinutes((prevMinutes) => prevMinutes + 1);
-    }, 60000);
-
-    return () => {
-      clearInterval(refMinutes.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    refHours.current = setInterval(() => {
+    }
+    if (minutes === 60) {
+      setMinutes(0);
       setHours((prevHrs) => prevHrs + 1);
-    }, 3600000);
-
-    return () => {
-      clearInterval(refHours.current);
-    };
-  }, []);
+    }
+    if (hours === 24) {
+      setHours(0);
+    }
+  }, [seconds, minutes, hours]);
 
   function handleStart() {
-    refSeconds.current = setInterval(() => {
-      setSeconds((prevSeconds) => prevSeconds + 1);
-    }, 1000);
-
-    refMinutes.current = setInterval(() => {
-      setMinutes((prevMinutes) => prevMinutes + 1);
-    }, 60000);
-
-    refHours.current = setInterval(() => {
-      setHours((prevHrs) => prevHrs + 1);
-    }, 3600000);
+    timeHandler();
   }
-
   function handlePause() {
-    clearInterval(refMinutes.current);
     clearInterval(refSeconds.current);
-    clearInterval(refHours.current);
   }
 
   function handleReset() {
@@ -79,6 +61,29 @@ function App() {
       </span>
     </div>
   );
+  // const [number, setNumber] = useState(0);
+  // const [count, setCount] = useState(0);
+
+  // function cubeNum(num) {
+  //   console.log("calculation done");
+  //   return Math.pow(num, 3);
+  // }
+  // // const result = cubeNum();
+  // const result = useMemo(() => cubeNum(number), [number]);
+  // return (
+  //   <div>
+  //     <input
+  //       type="number"
+  //       value={number}
+  //       onChange={(e) => {
+  //         setNumber(e.target.value);
+  //       }}
+  //     />
+  //     <h1>Cube of the number {result}</h1>
+  //     <button onClick={() => setCount(count + 1)}>Increment Count</button>
+  //     <h1>Count:{count}</h1>
+  //   </div>
+  // );
 }
 
 export default App;
